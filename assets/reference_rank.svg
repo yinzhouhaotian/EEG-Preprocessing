@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="480" viewBox="0 0 1000 480" role="img" aria-labelledby="title desc">
+<title id="title">参考与秩：通道数不等于独立信息数量</title><desc id="desc">三个参考示例展示共同参考抵消、平均参考约束和复制通道不能增加秩。</desc>
+<style>text{font-family:Segoe UI, Microsoft YaHei, Noto Sans CJK SC, sans-serif;fill:#182b49} .small{font-size:16px} .title{font-size:26px;font-weight:600}</style>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="40" y="43" class="title">参考与秩：通道数不等于独立信息数量</text>
+<rect x="30" y="110" width="310" height="250" rx="12" fill="white" stroke="#cbd5e1"/>
+<text x="48" y="148" class="small">共同参考</text>
+<text x="48" y="205" class="small">A′ = A − R</text>
+<text x="48" y="255" class="small">B′ = B − R</text>
+<text x="48" y="305" class="small">A′ − B′ = A − B</text>
+<rect x="355" y="110" width="310" height="250" rx="12" fill="white" stroke="#cbd5e1"/>
+<text x="373" y="148" class="small">两通道平均参考</text>
+<text x="373" y="205" class="small">A′ = (A − B) / 2</text>
+<text x="373" y="255" class="small">B′ = (B − A) / 2</text>
+<text x="373" y="305" class="small">A′ + B′ = 0：至多一个独立维度</text>
+<rect x="680" y="110" width="310" height="250" rx="12" fill="white" stroke="#cbd5e1"/>
+<text x="698" y="148" class="small">增加虚拟通道</text>
+<text x="698" y="205" class="small">C = A + B</text>
+<text x="698" y="255" class="small">C由A、B决定</text>
+<text x="698" y="305" class="small">三通道仍只有至多两个独立维度</text>
+<text x="40" y="415" class="small">重参考、插值或补零不会凭空恢复已经丢失的独立信号。</text>
+</svg>

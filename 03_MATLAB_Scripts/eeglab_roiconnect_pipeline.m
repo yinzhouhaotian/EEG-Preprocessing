@@ -1,5 +1,8 @@
+%% 修订状态（2026-10-16）：旧有改编示例，尚未在目标 MATLAB/插件环境运行验证。
+% 这不是官方原始脚本或已验证的通用管线；参数、通道类型、单位、参考、头模配准需逐项核对。
+% 请先阅读 ../03_MATLAB_Scripts/README.md；本次修订只更正说明，不保证运行行为。
 %% ========================================================================
-%  EEGLAB ROIconnect 源空间脑区功率 (含 FOOOF) 与功能连接 (MIM / TRGC) 标准代码
+%  EEGLAB ROIconnect 源空间脑区功率 (含 FOOOF) 与功能连接 (MIM / TRGC) 旧有教学示例（未运行验证）
 %  参考：https://eeglab.org/plugins/roiconnect/ (Pellegrini et al., 2023, NeuroImage)
 %  配套文档：../02_EEGLAB_Official_Tutorials/04_DIPFIT_STUDY_and_ROIconnect.md
 % =========================================================================
@@ -21,7 +24,7 @@ EEG = pop_roi_activity(EEG, ...
     'fooof', 'on', ...
     'fooof_frange', [1 30]);
 
-% 3. 计算脑区间无向功能连接 (MIM) 与抗容积传导有向连接 (TRGC)，固定 60 秒等长切片消除长度偏置
+% 3. 计算脑区间无向功能连接 (MIM) 与抗容积传导有向连接 (TRGC)，显式设置等时长片段，并检查残余的数据量与估计偏差
 EEG = pop_roi_connect(EEG, ...
     'methods', {'MIM', 'TRGC'}, ...
     'snippet', 'on', ...

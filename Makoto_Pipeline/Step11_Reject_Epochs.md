@@ -1,19 +1,20 @@
-# Step 11: 剔除极端坏段试次 (Reject epochs for cleaning)
+# Step 11：试次清理的目的与阈值
 
-> 所属手册：Makoto's Preprocessing Pipeline 中英对照（由 `Makotos_Preprocessing_Pipeline_CN_EN.md` 按章节拆分）
->
-> 章节导航：[00 声明与目录](00_Disclaimer_and_TOC.md) · [Step1](Step01_Double_Precision.md) · [Step2](Step02_Path_Import_icaact_Fix.md) · [Step3](Step03_Downsample.md) · [Step4](Step04_Highpass_1Hz.md) · [Step5](Step05_Channel_Info_EOG.md) · [Step6](Step06_Remove_Bad_Channels.md) · [Step7](Step07_Interpolate_Channels.md) · [Step8](Step08_Average_Reference_FullRank.md) · [Step9](Step09_CleanLine.md) · [Step10](Step10_Epoch_1to2s.md) · [Step11](Step11_Reject_Epochs.md) · [Step12](Step12_Adjust_Rank_ICA.md) · [Step13](Step13_Run_ICA.md) · [Step14-15](Step14-15_Dipole_Fitting.md) · [Step16](Step16_STUDY_No_Double_Dipping.md) · [Step17](Step17_Notes_ASR_ICLabel_SIFT.md) · [附录脚本](Appendix_Full_Batch_Script.md)
+> 类型：对用户提供的既有笔记进行重写校订；英文为校订说明，中文为对应译释，均非网页逐字引文。新增学习要点另列。核对日期：2026-10-16。
+> 来源：[Makoto原文](https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline)；原文为个人建议。[覆盖状态](../docs/COVERAGE.md) · [术语全称](../docs/GLOSSARY.md)。
 
-* **English Original**:
+## 英文校订说明
 
-  Aim for around 5–10% rejection rate (Delorme et al., 2007). Apply amplitude threshold of $-500$ to $500\,\mu\text{V}$ (don't capture eye blinks here; eye blinks will be removed by ICA), reject the selected epochs, and apply improbability test with $6\text{ SD}$ for single channels and $2\text{ SD}$ for all channels, and reject the selected again.
+Before fitting a stable mixing model, identify rare severe disturbances that the model is unlikely to explain. After cleaning, inspect remaining artifacts again. Amplitude and probability thresholds are screening choices, not proof of signal origin or universal rejection rules.
 
-* **中文译文与原理解析**：
+## 对应中文译释
 
-  在送入 ICA 前剔除坏段的目标是**清除罕见的非生物大振幅突变（如电极线剧烈晃动、吞咽动作）**，而不是剔除眨眼（眨眼具有极稳定的空间拓扑，留给 ICA 去除即可）。因此，在 ICA 前使用宽松的波幅阈值（如 $\pm 500\,\mu\text{V}$）配合联合概率分布检验（单通道 $6\text{ SD}$，全通道 $2\text{ SD}$），将总试次剔除率控制在 5%–10% 左右；待 ICA 去除眼电和肌电后，再用严格阈值（如 $\pm 100\,\mu\text{V}$）做最终质控。
+拟合稳定混合模型前，应识别模型难以解释的罕见严重干扰；清理后再检查残余伪迹。振幅和概率阈值是筛查选择，不是来源证明或统一删除规则。
 
-```
-% ICA 前预清洗：剔除波幅超出 [-500, 500] uV 及联合概率异常（单通道 6 SD, 全通道 2 SD）的极端坏段
-EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -500, 500, EEG.xmin, EEG.xmax, 0, 1);
-EEG = pop_jointprob(EEG, 1, 1:EEG.nbchan, 6, 2, 0, 1, 0, [], 0);
-```
+## 学习要点与适用限制
+
+吞咽是生理性伪迹，不能和电极线晃动一起称为非生物活动。应明确绝对幅度、峰峰值或联合概率等不同标准。示例中的数值与5%至10%比例不能作为必须达到的目标。按条件记录剩余试次数和删除原因，避免只为了保留更多试次而放过明显污染。
+
+## 进一步学习
+
+阅读[原理、例子与检查方法](../Learning_Guide/05_Artifacts_and_ASR.md)。这里的说明不是一条可直接运行的通用管线；代码状态见[示例说明](../03_MATLAB_Scripts/README.md)。

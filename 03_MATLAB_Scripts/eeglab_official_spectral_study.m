@@ -1,6 +1,9 @@
+%% 修订状态（2026-10-16）：旧有改编示例，尚未在目标 MATLAB/插件环境运行验证。
+% 这不是官方原始脚本或已验证的通用管线；参数、通道类型、单位、参考、头模配准需逐项核对。
+% 请先阅读 ../03_MATLAB_Scripts/README.md；本次修订只更正说明，不保证运行行为。
 %% ========================================================================
 %  EEGLAB Official Automated Spectral (Power) Pipeline (Tutorial 11.e)
-%  官方标准多被试功率谱全自动预处理与群组统计脚本
+%  多被试功率谱处理示例（按任务改编，未作运行验证）
 %  参考：https://eeglab.org/tutorials/11_Scripting/automated_pipeline.html
 %  配套文档：../02_EEGLAB_Official_Tutorials/04_DIPFIT_STUDY_and_ROIconnect.md
 % =========================================================================

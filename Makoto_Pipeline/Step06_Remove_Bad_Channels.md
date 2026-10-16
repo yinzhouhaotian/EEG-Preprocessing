@@ -1,31 +1,20 @@
-# Step 6: 剔除坏导 (Remove bad channels)
+# Step 6：坏通道与局部异常
 
-> 所属手册：Makoto's Preprocessing Pipeline 中英对照（由 `Makotos_Preprocessing_Pipeline_CN_EN.md` 按章节拆分）
->
-> 章节导航：[00 声明与目录](00_Disclaimer_and_TOC.md) · [Step1](Step01_Double_Precision.md) · [Step2](Step02_Path_Import_icaact_Fix.md) · [Step3](Step03_Downsample.md) · [Step4](Step04_Highpass_1Hz.md) · [Step5](Step05_Channel_Info_EOG.md) · [Step6](Step06_Remove_Bad_Channels.md) · [Step7](Step07_Interpolate_Channels.md) · [Step8](Step08_Average_Reference_FullRank.md) · [Step9](Step09_CleanLine.md) · [Step10](Step10_Epoch_1to2s.md) · [Step11](Step11_Reject_Epochs.md) · [Step12](Step12_Adjust_Rank_ICA.md) · [Step13](Step13_Run_ICA.md) · [Step14-15](Step14-15_Dipole_Fitting.md) · [Step16](Step16_STUDY_No_Double_Dipping.md) · [Step17](Step17_Notes_ASR_ICLabel_SIFT.md) · [附录脚本](Appendix_Full_Batch_Script.md)
+> 类型：对用户提供的既有笔记进行重写校订；英文为校订说明，中文为对应译释，均非网页逐字引文。新增学习要点另列。核对日期：2026-10-16。
+> 来源：[Makoto原文](https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline)；原文为个人建议。[覆盖状态](../docs/COVERAGE.md) · [术语全称](../docs/GLOSSARY.md)。
 
-* **English Original**:
+## 英文校订说明
 
-  What do you mean bad here? In short, the channels that you can't save even if you reject 5–10% of your datapoints. Removing bad channels is a critical step particularly for average referencing. This is because average reference signal is an average of all channels. If you have channels that are noisy all the time, including such channels to average will introduce noise to all the channels (see Nima's PREP pipeline paper, Bigdely-Shamlo et al., 2015).
+Persistent channel failures can contaminate spatial operations, including an arithmetic average reference. A channel with only a brief problem may be handled differently from a channel that is unusable throughout the recording. Rejection percentages are not targets to optimize.
 
-  For objective rejection criteria, check out: (1) Nima's PREP pipeline; (2) Christian's `clean_rawdata()` plugin; (3) Makoto's `trimOutlier()`. In writing batch scripts, keep the original `chanlocs` structure (`originalEEG = EEG;`) before channel rejection so that you can refer to it later for channel interpolation.
+## 对应中文译释
 
-* **中文译文与原理解析**：
+持续的通道故障可能污染包括算术平均参考在内的空间操作。只短时异常的通道，与全程不可用的通道可以采取不同处理。删除比例不是需要刻意达到的优化目标。
 
-  什么是“坏导”？简言之，就是哪怕你删掉 5%–10% 的时间点也依然救不回来的高噪声或断路（平线）通道。**在进行全脑平均重参考（Average Referencing）之前，必须先剔除坏导！** 因为全脑平均参考会计算所有通道的均值并从每个通道中减去；如果保留了一个持续高噪声的坏导，它的噪声就会通过均值计算扩散污染到全脑每一个好通道中。在写批处理脚本时，务必在剔除坏导前先备份原始通道坐标（`originalEEG = EEG;`），以便后续插值时作为完整坐标模板。
+## 学习要点与适用限制
 
-```
-% 备份原始完整通道结构，以便后续球面插值使用
-originalEEG = EEG;
+综合波形、频谱、平线、跳变及空间关系判断。记录坏导位置、原因与时段，并保留原布局供插值与比较。自动相关检测依赖参考、布局和算法实现；不把一个相关阈值当作所有数据的客观真值。不同管线也可能先作临时参考，再剔除坏导后重新定义参考。
 
-% 使用 clean_rawdata 仅执行平线通道与高噪坏导剔除（暂不开启 ASR 与时间窗裁剪）
-EEG = pop_clean_rawdata(EEG, ...
-    'FlatlineCriterion', 5, ...
-    'ChannelCriterion', 0.8, ...
-    'LineNoiseCriterion', 4, ...
-    'Highpass', 'off', ...
-    'BurstCriterion', 'off', ...
-    'WindowCriterion', 'off', ...
-    'BurstRejection', 'off', ...
-    'Distance', 'Euclidian');
-```
+## 进一步学习
+
+阅读[原理、例子与检查方法](../Learning_Guide/05_Artifacts_and_ASR.md)。这里的说明不是一条可直接运行的通用管线；代码状态见[示例说明](../03_MATLAB_Scripts/README.md)。

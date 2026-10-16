@@ -1,18 +1,20 @@
-# Step 3: 按需降采样 (Downsample if necessary)
+# Step 3：按目标决定是否降采样
 
-> 所属手册：Makoto's Preprocessing Pipeline 中英对照（由 `Makotos_Preprocessing_Pipeline_CN_EN.md` 按章节拆分）
->
-> 章节导航：[00 声明与目录](00_Disclaimer_and_TOC.md) · [Step1](Step01_Double_Precision.md) · [Step2](Step02_Path_Import_icaact_Fix.md) · [Step3](Step03_Downsample.md) · [Step4](Step04_Highpass_1Hz.md) · [Step5](Step05_Channel_Info_EOG.md) · [Step6](Step06_Remove_Bad_Channels.md) · [Step7](Step07_Interpolate_Channels.md) · [Step8](Step08_Average_Reference_FullRank.md) · [Step9](Step09_CleanLine.md) · [Step10](Step10_Epoch_1to2s.md) · [Step11](Step11_Reject_Epochs.md) · [Step12](Step12_Adjust_Rank_ICA.md) · [Step13](Step13_Run_ICA.md) · [Step14-15](Step14-15_Dipole_Fitting.md) · [Step16](Step16_STUDY_No_Double_Dipping.md) · [Step17](Step17_Notes_ASR_ICLabel_SIFT.md) · [附录脚本](Appendix_Full_Batch_Script.md)
+> 类型：对用户提供的既有笔记进行重写校订；英文为校订说明，中文为对应译释，均非网页逐字引文。新增学习要点另列。核对日期：2026-10-16。
+> 来源：[Makoto原文](https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline)；原文为个人建议。[覆盖状态](../docs/COVERAGE.md) · [术语全称](../docs/GLOSSARY.md)。
 
-* **English Original**:
+## 英文校订说明
 
-  You may downsample the data to around 250Hz if the original sampling frequency is higher than that. Usually low-pass filter is necessary before downsampling for anti-aliasing, but EEGLAB function applies the anti-aliasing filter automatically. Downsampling is useful to compress the data size. It also helps ICA to produce better decomposition by cutting off unnecessary high-frequency information, though we have not tested it quantitatively.
+Downsampling reduces storage and computation but limits bandwidth and timing precision. Apply an appropriate anti-aliasing operation before sample reduction, or use a resampling function that includes it. A lower sampling rate does not guarantee a better decomposition.
 
-* **中文译文与原理解析**：
+## 对应中文译释
 
-  如果原始采样率较高（例如 1000 Hz），可以将连续数据降采样至 **250 Hz**（若原始为 512/1024 Hz 则可降至 256 Hz；若做 SIFT 格兰杰因果连接性分析可降至 100–128 Hz）。降采样前必须进行抗混叠低通滤波（Anti-aliasing low-pass filter），而 EEGLAB 的 `pop_resample()` 函数会自动内置执行抗混叠滤波。降采样不仅能大幅压缩数据体积、加速后续计算，还能通过滤除不必要的高频噪声来帮助 ICA 获得更好的分解质量。
+降采样减少存储与计算量，但会限制带宽和时间精度。减少采样点之前应有适当的抗混叠处理，或使用内置该处理的重采样函数。降低采样率不保证分解质量改善。
 
-```
-% 将连续脑电数据降采样至 250 Hz（内置自动抗混叠低通滤波）
-EEG = pop_resample(EEG, 250);
-```
+## 学习要点与适用限制
+
+250或256赫兹只是可能的工作值；较高频率研究、事件潜伏期研究及自回归建模可能有不同需要。核对实际目标带宽、滤波过渡带和事件变换，不把简单抽点与带滤波重采样混用。已有笔记中的“改善分解”需要保留其未经定量确认的限定。
+
+## 进一步学习
+
+阅读[原理、例子与检查方法](../Learning_Guide/04_Filtering_and_Resampling.md)。这里的说明不是一条可直接运行的通用管线；代码状态见[示例说明](../03_MATLAB_Scripts/README.md)。

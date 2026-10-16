@@ -1,12 +1,15 @@
+%% 修订状态（2026-10-16）：旧有改编示例，尚未在目标 MATLAB/插件环境运行验证。
+% 这不是官方原始脚本或已验证的通用管线；参数、通道类型、单位、参考、头模配准需逐项核对。
+% 请先阅读 ../03_MATLAB_Scripts/README.md；本次修订只更正说明，不保证运行行为。
 %% ========================================================================
-%  Makoto's Preprocessing Pipeline - Standardized MATLAB Batch Script
+%  Makoto's Preprocessing Pipeline - Legacy MATLAB Teaching Example (Not Runtime Validated)
 %  适用场景：任务态脑电功率谱（PSD/ERSP）与功能连接（Connectivity）预处理
 %  依赖工具箱：EEGLAB (含 clean_rawdata, CleanLine, DIPFIT, ICLabel 插件)
 %  配套文档：../01_Makoto_Pipeline/ 各章节
 % =========================================================================
 clear; clc;
 
-% 1. 启动 EEGLAB 并强制开启双精度运算 (Step 1)
+% 1. 启动 EEGLAB 并核对所需矩阵运算的数值精度 (Step 1)
 [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
 pop_editoptions('option_single', false, 'option_computeica', true);
 
@@ -29,12 +32,12 @@ for iSub = 1:length(subFiles)
     EEG = pop_loadset('filename', subName, 'filepath', rawFolder);
     EEG = eeg_checkset(EEG);
     
-    % 3. 连续数据降采样（内置抗混叠滤波，必须在分段前执行，Step 3）
+    % 3. 连续数据降采样（内置抗混叠滤波，通常在连续阶段执行，并核对事件映射，Step 3）
     if EEG.srate > targetSfreq
         EEG = pop_resample(EEG, targetSfreq);
     end
     
-    % 4. 1 Hz 高通滤波消除慢漂移，保障宽平稳性 WSS 与 ICA 质量 (Step 4)
+    % 4. 1 Hz 高通滤波消除慢漂移，衰减慢漂移；不保证宽平稳性或 ICA 质量 (Step 4)
     EEG = pop_eegfiltnew(EEG, 'locutoff', 1, 'plotfreqz', 0);
     
     % 5. 导入标准 10-5 系统 MNI 通道坐标并优化头心 (Step 5)
@@ -61,14 +64,14 @@ for iSub = 1:length(subFiles)
     %    注意：若后续在传感器空间直接计算通道间连接性，请记录被插值通道索引并在连接矩阵中将其排除
     EEG = pop_interp(EEG, originalEEG.chanlocs, 'spherical');
     
-    % 8. 满秩全脑平均重参考（先补零值初始参考通道，求平均后再移除，Step 8）
+    % 8. 补回原参考后重参考（需确认参考确实缺失；不恢复既有秩损失）（先补零值初始参考通道，求平均后再移除，Step 8）
     EEG.nbchan = EEG.nbchan + 1;
     EEG.data(end+1, :) = zeros(1, EEG.pnts);
     EEG.chanlocs(1, EEG.nbchan).labels = 'initialReference';
     EEG = pop_reref(EEG, []);
     EEG = pop_select(EEG, 'nochannel', {'initialReference'});
     
-    % 9. 使用新版 CleanLine 去除 50 Hz 及 100 Hz 工频正弦噪声，不破坏背景频谱 (Step 9)
+    % 9. 使用新版 CleanLine 去除 50 Hz 及 100 Hz 工频正弦噪声，并检查目标信号与背景频谱是否受到影响 (Step 9)
     if exist('pop_cleanline', 'file')
         EEG = pop_cleanline(EEG, 'bandwidth', 2, 'chanlist', 1:EEG.nbchan, ...
             'computepower', 1, 'linefreqs', [50 100], 'newversion', 1, ...
